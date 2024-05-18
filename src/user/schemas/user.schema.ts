@@ -11,9 +11,9 @@ export class User {
   _id: ObjectId;
 
   @Prop({ required: false, unique: true })
-  firebase_id: string;
+  firebase_id?: string;
 
-  @Prop({ required: true, unique: true })
+  @Prop({ required: true, unique: true, sparse: true })
   email: string;
 
   @Prop({ required: false })

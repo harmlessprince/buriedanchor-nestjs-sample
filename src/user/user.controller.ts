@@ -5,7 +5,8 @@ import { UpdateUserDto } from './dto/update-user.dto';
 
 @Controller('user')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly userService: UserService) {
+  }
 
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
@@ -30,5 +31,23 @@ export class UserController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.userService.remove(+id);
+  }
+
+  @Get('/generate/users')
+  async generateUsers() {
+    const users = [
+      'tao@yopmail.com',
+      'daniel@yopmail.com',
+      'random@yopmail.com',
+    ];
+    for (const user of users) {
+      const createUserDto = new CreateUserDto();
+      createUserDto.email = user;
+      createUserDto.password = 'password';
+      if (!(await this.userService.findOneByEmail(user))) {
+        await this.userService.create(createUserDto);
+      }
+    }
+    return 'users generated';
   }
 }

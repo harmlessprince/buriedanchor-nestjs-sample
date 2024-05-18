@@ -1,4 +1,4 @@
-import { Controller, Get, Header, Ip, Param, Req, Res, Headers } from '@nestjs/common';
+import { Controller, Get, Header, Param, Req, Res } from '@nestjs/common';
 import { AppService } from './app.service';
 import { Response } from 'express';
 import { LinkService } from './link/link.service';
@@ -6,7 +6,7 @@ import { CreateLinkEventDto } from './link/dto/link-event.dto';
 import * as geoip from 'geoip-lite';
 import * as useragent from 'useragent';
 import { getTrueBrowser } from './core/utils';
-
+import * as requestip from 'request-ip';
 @Controller()
 export class AppController {
   constructor(
@@ -20,6 +20,8 @@ export class AppController {
     return this.appService.getHello();
   }
 
+
+
   @Get(':slug')
   @Header(
     'Cache-Control',
@@ -29,7 +31,6 @@ export class AppController {
     @Param('slug') slug: string,
     @Res() response: Response,
     @Req() request,
-    @Ip() ip,
   ) {
     const link = await this.linkService.findOneBySlug(slug);
     if (link == null) {
@@ -42,8 +43,9 @@ export class AppController {
     }
     const fccUrl = new URL(link.url);
     const linkEventDto = new CreateLinkEventDto();
-    const geo = geoip.lookup(ip);
-    console.log(geo);
+    const clientIp = requestip.getClientIp(request);
+    const geo = geoip.lookup(clientIp);
+    console.log(clientIp);
     const userAgentString = request.headers['user-agent'];
     const agent = useragent.lookup(userAgentString);
     const os = agent.os;
