@@ -60,8 +60,9 @@ export class AppController {
     );
     linkEventDto.link = link._id;
     linkEventDto.city = city.length < 1 ? 'Unknown' : city;
-    linkEventDto.country = country;
-    linkEventDto.operating_system = os.family;
+    linkEventDto.country = country.length < 1 ? 'Unknown' : country;
+    linkEventDto.operating_system =
+      os.family.length < 1 ? 'unknown' : os.family;
     linkEventDto.referrer = referrer ?? 'unknown';
 
     await this.linkService.createLinkEvent(linkEventDto);
