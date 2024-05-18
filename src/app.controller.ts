@@ -32,9 +32,13 @@ export class AppController {
     @Ip() ip,
   ) {
     const link = await this.linkService.findOneBySlug(slug);
+    if (link == null) {
+      // Handle the case where ID is not found
+      return response.status(404).send('Item not found');
+    }
     if (!link) {
       // Handle the case where ID is not found
-      response.status(404).send('Item not found');
+      return response.status(404).send('Item not found');
     }
     const fccUrl = new URL(link.url);
     const linkEventDto = new CreateLinkEventDto();
@@ -59,6 +63,6 @@ export class AppController {
     linkEventDto.referrer = referrer ?? 'unknown';
 
     await this.linkService.createLinkEvent(linkEventDto);
-    response.redirect(302, fccUrl.href);
+    return response.redirect(302, fccUrl.href);
   }
 }
