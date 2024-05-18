@@ -5,8 +5,9 @@ import { LinkService } from './link/link.service';
 import { CreateLinkEventDto } from './link/dto/link-event.dto';
 import * as geoip from 'geoip-lite';
 import * as useragent from 'useragent';
-import { getTrueBrowser } from './core/utils';
+import { getTrueBrowser, retrieveReferrer } from './core/utils';
 import * as requestip from 'request-ip';
+
 @Controller()
 export class AppController {
   constructor(
@@ -15,14 +16,13 @@ export class AppController {
   ) {
   }
 
-  @Get()
+  @Get('/')
   getHello(): string {
     return this.appService.getHello();
   }
 
 
-
-  @Get(':slug')
+  @Get('/:slug')
   @Header(
     'Cache-Control',
     'no-store, no-cache, must-revalidate, proxy-revalidate',
@@ -54,12 +54,12 @@ export class AppController {
     const country = geo ? geo.country : 'Unknown';
     const city = geo ? geo.city : 'Unknown';
     const browser = getTrueBrowser(ua);
-    const referrer = request.headers['referer'];
+    const referrer = retrieveReferrer(request.headers['referer']);
     console.log(
       `Country: ${country}, City: ${city}, Browser: ${browser},  Device: ${device.family}, OS:  ${os.family},`,
     );
     linkEventDto.link = link._id;
-    linkEventDto.city = city;
+    linkEventDto.city = city.length < 1 ? 'Unknown' : city;
     linkEventDto.country = country;
     linkEventDto.operating_system = os.family;
     linkEventDto.referrer = referrer ?? 'unknown';

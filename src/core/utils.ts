@@ -5,9 +5,11 @@ export interface TokenPayload {
   email: string;
   userId: ObjectId;
 }
+
 export interface BrowserObject {
   [key: string]: boolean | string;
 }
+
 export async function hashPassword(password: string) {
   return await bcrypt.hash(password, 10);
 }
@@ -30,7 +32,6 @@ export const success = (
     statusCode: 200,
   };
 };
-
 
 
 export function getRandomLetter(letters: string) {
@@ -94,6 +95,25 @@ export function slugify(slug: string) {
     .replace(/^-+|-+$/g, '');
 }
 
+export function retrieveReferrer(referrer: string): string | null {
+  if (referrer == '') {
+    return 'unknown';
+  }
+  referrer = referrer.toLocaleLowerCase();
+  if (referrer.includes('facebook')) {
+    return 'facebook';
+  } else if (referrer.includes('youtube')) {
+    return 'youtube';
+  } else if (referrer.includes('instagram')) {
+    return 'instagram';
+  } else if (referrer.includes('tiktok')) {
+    return 'tiktok';
+  } else if (referrer.includes('snapchat')) {
+    return 'snapchat';
+  } else {
+    return referrer;
+  }
+}
 
 export function getTrueBrowser(browserObject: BrowserObject): string | null {
   const majorBrowsers = [

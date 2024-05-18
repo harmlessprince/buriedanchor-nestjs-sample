@@ -4,12 +4,12 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import mongoose, { Model } from 'mongoose';
 import { Link } from './schemas/link.schema';
 import { CreateLinkDto, UpdateLinkDto } from './dto/create-link.dto';
 import {
   generateSlug,
-  isValidHttpUrl,
+  isValidHttpUrl, retrieveReferrer,
   shuffleString,
   slugify,
 } from '../core/utils';
@@ -113,7 +113,33 @@ export class LinkService {
   }
 
   public async findAll(UserID: string) {
-    return await this.linkModel.find({ user: UserID }).exec();
+    const linksWithClicksCount = await this.linkModel.aggregate([
+      {
+        $match: {
+          user: new mongoose.Types.ObjectId(UserID), // filtering by user id
+        },
+      },
+      {
+        $lookup: {
+          from: 'linkevents', // Collection name in MongoDB
+          localField: '_id',
+          foreignField: 'link', // Field in the linkevents collection that references the User
+          as: 'linkevents',
+        },
+      },
+      {
+        $addFields: {
+          clicksCount: { $size: '$linkevents' },
+        },
+      },
+      {
+        $project: {
+          linkevents: 0,
+        },
+      },
+    ]);
+    // return await this.linkModel.find({ user: UserID }).exec();
+    return linksWithClicksCount;
   }
 
   public async createLinkEvent(createLinkEventDto: CreateLinkEventDto) {
@@ -185,5 +211,15 @@ export class LinkService {
       topOperatingSystems: result[0].topOperatingSystems,
       topReferrers: result[0].topReferrers,
     };
+  }
+
+  public async cleanUpLinkEvents() {
+    const events = await this.linkEventModel.find().exec();
+    for (const event of events) {
+      await this.linkEventModel.findOneAndUpdate(
+        { _id: event._id },
+        { referrer: retrieveReferrer(event.referrer) },
+      );
+    }
   }
 }

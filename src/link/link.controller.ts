@@ -73,4 +73,10 @@ export class LinkController {
     await this.linkService.remove(id);
     return success(null, 'Link deleted');
   }
+
+  @Get('/cleanup/events')
+  async cleanupEvents() {
+    await this.linkService.cleanUpLinkEvents();
+    return success(null, 'Link  events cleaned up');
+  }
 }
