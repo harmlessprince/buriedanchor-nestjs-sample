@@ -5,12 +5,14 @@ import { CreateUserDto } from '../user/dto/create-user.dto';
 import { LoginDto } from './dtos/login-dto';
 import { comparePassword, TokenPayload } from '../core/utils';
 import { JwtService } from '@nestjs/jwt';
+import { GoogleAuthenticationService } from './google.authentication.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private userService: UserService,
     private readonly jwtService: JwtService,
+    private readonly googleAuthenticationService: GoogleAuthenticationService,
   ) {
   }
 
@@ -25,9 +27,7 @@ export class AuthService {
   }
 
   async logUserIn(loginDto: LoginDto) {
-    const user: User = await this.userService.findOneByEmail(
-      loginDto.email,
-    );
+    const user: User = await this.userService.findOneByEmail(loginDto.email);
     if (!user) {
       throw new HttpException(
         'Wrong credentials provided',
@@ -49,5 +49,9 @@ export class AuthService {
       user: { email: user.email, id: user._id },
       accessToken: await this.jwtService.signAsync(payload),
     };
+  }
+
+  async getAuthenticatedUser(payload: TokenPayload) {
+    return await this.userService.findOneByEmail(payload.email);
   }
 }

@@ -17,6 +17,38 @@ export class UserService {
     return createdUser.save();
   }
 
+  async createWithGoogle(
+    email: string,
+    firebase_id: string,
+    name: string,
+    photo: string,
+  ) {
+    const newUser = new this.userModel({
+      name: name,
+      firebase_id: firebase_id,
+      email: email,
+      photo: photo,
+    });
+    return await newUser.save();
+  }
+
+  async updateWithGoogle(
+    email: string,
+    firebase_id: string,
+    name: string,
+    photo: string,
+  ) {
+    return this.userModel.findOneAndUpdate(
+      { email: email },
+      {
+        name: name,
+        firebase_id: firebase_id,
+        email: email,
+        photo: photo,
+      },
+    );
+  }
+
   findAll() {
     return `This action returns all user`;
   }
@@ -27,6 +59,10 @@ export class UserService {
 
   async findOneByEmail(email: string): Promise<User> {
     return await this.userModel.findOne({ email: email }).exec();
+  }
+
+  async findOneByID(id: string): Promise<User> {
+    return await this.userModel.findOne({ _id: id }).exec();
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {

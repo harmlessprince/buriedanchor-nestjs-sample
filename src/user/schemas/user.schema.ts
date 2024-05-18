@@ -11,9 +11,18 @@ export class User {
   _id: ObjectId;
 
   @Prop({ required: true, unique: true })
+  firebase_id: string;
+
+  @Prop({ required: true, unique: true })
   email: string;
 
-  @Prop({ required: true })
+  @Prop({ required: false })
+  name: string;
+
+  @Prop({ required: false })
+  photo: string;
+
+  @Prop({ required: false })
   @Exclude()
   password: string;
 }

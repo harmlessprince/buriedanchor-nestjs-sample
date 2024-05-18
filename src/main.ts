@@ -4,7 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import { ValidationPipe } from '@nestjs/common';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.setGlobalPrefix('api');
+  app.setGlobalPrefix('api', { exclude: ['/:slug'] });
   app.useGlobalPipes(
     new ValidationPipe({ stopAtFirstError: true, whitelist: true }),
   );

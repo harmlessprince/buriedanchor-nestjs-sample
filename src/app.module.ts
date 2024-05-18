@@ -12,6 +12,7 @@ import { LinkModule } from './link/link.module';
   imports: [
     UserModule,
     AuthModule,
+    LinkModule,
     ConfigModule.forRoot({ isGlobal: true }),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
