@@ -110,6 +110,12 @@ export function retrieveReferrer(referrer: string): string | null {
     return 'tiktok';
   } else if (referrer.includes('snapchat')) {
     return 'snapchat';
+  } else if (referrer.includes('twitter')) {
+    return 'twitter';
+  } else if (referrer.includes('whatsapp')) {
+    return 'whatsapp';
+  } else if (referrer.includes('telegram')) {
+    return 'telegram';
   } else {
     return referrer;
   }
